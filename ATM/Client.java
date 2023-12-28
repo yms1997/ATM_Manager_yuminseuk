@@ -6,6 +6,22 @@ public class Client {
   String pw;
   String name;
 
+  public int getClientNo() {
+    return clientNo;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getPw() {
+    return pw;
+  }
+
+  public String getName() {
+    return name;
+  }
+
   public Client(int clientNo, String id, String pw, String name) {
     this.clientNo = clientNo;
     this.id = id;

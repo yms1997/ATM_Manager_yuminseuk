@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Util {
   Scanner sc = new Scanner(System.in);
 
-  final String CUR_PATH = System.getProperty("user.dir") + "\\level7\\src\\ATM\\";
+  final String CUR_PATH = System.getProperty("user.dir") + "\\ATM_Manager_yuminseuk\\ATM_Manager_yuminseuk\\" + this.getClass().getPackageName() + "\\";
 
   public Util() {}
 
@@ -19,7 +19,7 @@ public class Util {
 
   int getValue(String msg, int start, int end) {
     while (true) {
-      System.out.printf("▶ %s[%d-%d] 입력:", msg, start, end);
+      System.out.printf("▶ %s[ %d - %d ] 입력:", msg, start, end);
       try {
         int num = sc.nextInt();
         sc.nextLine();
@@ -36,7 +36,7 @@ public class Util {
   }
 
   String getValue(String msg) {
-    System.out.printf("▶ %s 입력:", msg);
+    System.out.printf("▶ %s 입력: ", msg);
     return sc.next();
   }
 

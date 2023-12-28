@@ -1,63 +1,50 @@
 package ATM;
 
+import java.util.ArrayList;
+
 public class ClientDAO {
-  Client[] cliList;
-  int cnt;
+  ArrayList<Client> cliList;
   Util ut;
   int maxNo;
+  Client log;
 
   ClientDAO(){
     ut = new Util();
+    cliList = new ArrayList<>();
     maxNo = 1001;
   }
 
-  Client getOneClientbyId(String id){
-    if(cnt == 0) return null;
-    for (Client c : cliList) {
-      if(id.equals(c.id)){
-        return c;
-      }
-    }
-    return null;
-  }
-
-  int getIdIdx(Client cli){
-    if(cliList == null) return -1;
-    for (int i = 0; i < cnt; i++) {
-      if(cli == cliList[i]){
-        return i;
-      }
-    }
-    return -1;
-  }
-  boolean checkPw(int idx, String pw){
-    if(cliList[idx].pw.equals(pw)){
-      return true;
-    }
-    return false;
-  }
-
-  void addClientsFromData(String data){
+  void addClientsFromData(String data){ // 저장된파일 나눠서 배열에 넣기
+    if(data.isEmpty()) return;
     String[] temp = data.split("\n");
-    cliList = new Client[temp.length];
-    cnt = temp.length;
-    for (int i = 0; i < cnt; i++) {
+    for (int i = 0; i < temp.length; i++) {
       String[] info = temp[i].split("/");
-      Client cl = new Client(Integer.parseInt(info[0]),info[1],info[2],info[3]);
-      cliList[i] = cl;
+      cliList.add(new Client(Integer.parseInt(info[0]), info[1], info[2], info[3]));
     }
+    maxNo = updateMaxStuNo();
   }
 
-  boolean hasClientData(){
-    if(cliList == null){
-      System.out.println("데이터가 존재하지 않습니다");
+  int updateMaxStuNo() { // 최신번호화
+    if(cliList.size() == 0) return maxNo;
+    int maxNo = 0;
+    for(Client c : cliList) {
+      if(maxNo < c.clientNo) {
+        maxNo = c.clientNo;
+      }
+    }
+    return maxNo;
+  }
+
+  boolean hasClientData(){ // 데이터유무 확인
+    if(cliList.size() == 0){
+      System.out.println("[ No Client Data ]");
       return false;
     }
     return true;
   }
 
-  String saveAsFileData() {
-    if(cnt == 0) return "";
+  String saveAsFileData() { // 파일저장
+    if(cliList.size() == 0) return "";
     String data = "";
     for(Client cl : cliList) {
       data += cl.saveToData();
@@ -65,61 +52,67 @@ public class ClientDAO {
     return data;
   }
 
-  void updateMaxStuNo() {
-    if(cnt == 0) return;
-    int maxNo = 0;
-    for(Client c : cliList) {
-      if(maxNo < c.clientNo) {
-        maxNo = c.clientNo;
-      }
-    }
-    this.maxNo = maxNo;
-  }
-
   void addOneClient(){ // 회원가입
     String newId = ut.getValue("[추가] id 입력 : ");
     Client c = getOneClientbyId(newId);
     if(c != null){
-      System.out.println("중복된 id 입니다");
+      System.out.println("중복된 id입니다");
       return;
     }
     String newPw = ut.getValue("[추가] pw 입력 : ");
     String newName = ut.getValue("[추가] 이름 입력 : ");
-    Client cli = new Client(++maxNo,newId,newPw,newName);
-    System.out.println(cli);
-    insertClient(cli);
+    Client client = new Client(++maxNo, newId, newPw, newName);
+    cliList.add(client);
     System.out.println("회원가입 완료!");
   }
 
-  void insertClient(Client cli){
-    if(cnt == 0){
-      cliList = new Client[cnt + 1];
-    }
-    else{
-      Client[] temp = cliList;
-      cliList = new Client[cnt + 1];
-      int idx = 0;
-      for (int i = 0; i < cnt; i++) {
-        cliList[idx++] = temp[i];
+  Client getOneClientbyId(String id){ // 아이디 찾기
+    if(cliList.size() == 0) return null;
+    for (Client c : cliList) {
+      if(c.id.equals(id)){
+        return c;
       }
-      cliList[cnt] = cli;
-      cnt += 1;
     }
+    return null;
   }
 
-  String loginClient(){ // 로그인
+  boolean loginClient(){ // 로그인
+    if(!hasClientData()) return false;
     String Id = ut.getValue("[로그인] id ");
     Client c = getOneClientbyId(Id);
+    if(c == null){
+      System.out.println("없는 아이디 입니다");
+      return false;
+    }
     String Pw = ut.getValue("[로그인] pw ");
-    if(getIdIdx(c) == -1 || !checkPw(getIdIdx(c),Pw)){
-      System.out.println("id 및 pw 확인");
-      return "";
+    if(Pw.equals(c.pw)){
+      System.out.println("[ 로그인 성공 ]");
+      log = c;
+      return true;
+    }
+    else {
+      System.out.println("[ 로그인 실패 ]");
+      return false;
     }
 
-    return c.id;
   }
 
+  int getIdIdx(Client c){ // 인덱스찾기
+    if(cliList.size() == 0) return -1;
+    for (Client client : cliList) {
+      if(client.id.equals(c.id)){
+        return cliList.indexOf(c);
+      }
+    }
+    return -1;
+  }
 
+  boolean checkPw(int idx, String Pw){ // 비밀번호검사
+    if(cliList.get(idx).pw.equals(Pw)){
+      return true;
+    }
+    return false;
+  }
 
   void printAllClient(){ // 회원 전체조회
     for (Client c : cliList) {
@@ -140,8 +133,8 @@ public class ClientDAO {
       return;
     }
     String changeName = ut.getValue("[수정] 이름 입력 : ");
-    cliList[getIdIdx(c)].pw = changePw;
-    cliList[getIdIdx(c)].name = changeName;
+   cliList.get(getIdIdx(c)).pw = changePw;
+   cliList.get(getIdIdx(c)).name = changeName;
     System.out.println("회원 수정 완료!");
   }
 
@@ -153,26 +146,23 @@ public class ClientDAO {
       System.out.println("제대로 된 id 입력");
       return;
     }
-    int idx = getIdIdx(c);
-    removeClient(idx);
+    cliList.remove(c);
     acc.deleteAllAccountsInOneClient(c);
-    System.out.println(c + "회원 삭제 완료!");
+    System.out.println("회원 삭제 완료!");
   }
 
-  void removeClient(int idx){
-    if(cnt == 1){
-      cliList = null;
-      cnt = 0;
-      return;
+  boolean deleteLogClient(AccountDAO aDAO){
+    String pw = ut.getValue("비밀번호");
+    if(!log.pw.equals(pw)){
+      System.out.println("비밀번호가 일치하지 않습니다");
+      return false;
     }
-    Client[] temp = cliList;
-    cliList = new Client[cnt - 1];
-    int index = 0;
-    for (int i = 0; i < cnt; i++) {
-      if(i != idx){
-        cliList[index++] = temp[i];
-      }
-    }
-    cnt -= 1;
+    int delIdx = getIdIdx(log);
+    cliList.remove(delIdx);
+    aDAO.deleteAllAccountsInOneClient(log);
+    System.out.println(log + "\n [ 회원 삭제 완료 ]");
+    log = null;
+    return true;
   }
+
 }

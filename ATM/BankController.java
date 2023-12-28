@@ -5,8 +5,7 @@ public class BankController {
     AccountDAO accDAO;
     ClientDAO cliDAO;
     Util ut;
-    String log;
-
+    String logId;
     BankController() {
         accDAO = new AccountDAO();
         cliDAO = new ClientDAO();
@@ -66,9 +65,9 @@ public class BankController {
             } else if (sel == 3) {
                 cliDAO.delOneClient(accDAO);
             } else if (sel == 4) {
-                ut.saveToFile(accDAO,cliDAO);
+                ut.saveToFile(accDAO, cliDAO);
             } else if (sel == 5) {
-                ut.loadFromFile(accDAO,cliDAO);
+                ut.loadFromFile(accDAO, cliDAO);
             } else if (sel == 6) {
                 accDAO.printAllAccount();
             }
@@ -84,8 +83,8 @@ public class BankController {
             } else if (sel == 1) {
                 cliDAO.addOneClient();
             } else if (sel == 2) {
-                log = cliDAO.loginClient();
-                if(!log.equals("")){
+                System.out.println("[ 로그인 ]");
+                if(cliDAO.loginClient()){
                     loginuserMenu();
                 }
             }
@@ -96,20 +95,20 @@ public class BankController {
             System.out.println("[1]계좌추가 [2]계좌삭제 [3]입금 [4]출금 [5]이체 [6]탈퇴 [7]마이페이지 [0]로그아웃");
             int sel = ut.getValue("메뉴 입력",0, 7);
             if(sel == 0){
-                log = "";
+                cliDAO.log = null;
                 return;
             } else if (sel == 1) {
-                
+                accDAO.addOneAcc(cliDAO.log);
             } else if (sel == 2) {
-                
+                accDAO.removeOncAcc(cliDAO.log);
             } else if (sel == 3) {
-                
+                accDAO.depositMoney(cliDAO.log);
             } else if (sel == 4) {
-                
+                accDAO.withdrawMoney(cliDAO.log);
             } else if (sel == 5) {
-                
+                accDAO.transferMoney(cliDAO.log);
             } else if (sel == 6) {
-                
+                if(cliDAO.deleteLogClient(accDAO)) return;
             } else if (sel == 7) {
                 
             }
