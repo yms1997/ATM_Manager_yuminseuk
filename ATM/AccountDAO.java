@@ -31,14 +31,15 @@ public class AccountDAO {
     return data;
   }
 
-  Account getOneAccountbyId(String id){ // id 중복검사
-    if(accList.size()== 0) return null;
-    for (Account a : accList) {
-      if(id.equals(a.clientId)){
-        return a;
+  ArrayList<Account> getAllAccountbyId(String id){
+    if(accList.size() == 0) return null;
+    ArrayList<Account> list = new ArrayList<>();
+    for (int i = 0; i < accList.size(); i++) {
+      if(accList.get(i).clientId.equals(id)){
+        list.add(accList.get(i));
       }
     }
-    return null;
+    return list;
   }
 
   void deleteAllAccountsInOneClient(Client cli){ // 한 회원 모든 계좌정보 삭제
@@ -188,9 +189,13 @@ public class AccountDAO {
   }
 
   void showLogAccount(Client client){
+    ArrayList<Account> temp = getAllAccountbyId(client.id);
     System.out.println("================================");
-    System.out.println("회원번호\t      계좌번호       잔액");
+    System.out.println("회원번호\t계좌번호\t잔액");
     System.out.println("--------------------------------");
+    for (Account acc : temp) {
+      System.out.println(acc);
+    }
   }
 
   void printAllAccount(){

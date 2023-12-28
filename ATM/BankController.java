@@ -110,7 +110,7 @@ public class BankController {
             } else if (sel == 6) {
                 if(cliDAO.deleteLogClient(accDAO)) return;
             } else if (sel == 7) {
-                
+                accDAO.showLogAccount(cliDAO.log);
             }
 
         }
